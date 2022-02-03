@@ -8,6 +8,7 @@ import java.util.Scanner;
 public class WebServer {
 
     private final int port;
+    private final static String RESOURCES_DIRECTORY = "src/main/resources/";
 
     public WebServer(int port) {
         this.port = port;
@@ -35,22 +36,21 @@ public class WebServer {
 
             String line = "";
             String header = "";
-            String resource = "";
+            String resourceName;
             try (Socket socket = serverSocket.accept();
-                 BufferedReader bufferedReader1 = new BufferedReader(
+                 BufferedReader bufferedReader = new BufferedReader(
                          new InputStreamReader(socket.getInputStream()));
                  BufferedWriter bufferedWriter = new BufferedWriter(
                          new OutputStreamWriter(socket.getOutputStream()))) {
-                do {
+                while (/*(line = bufferedReader.readLine()) != null ||*/ !(line = bufferedReader.readLine()).isEmpty()); {
                     if (line.startsWith("GET")) {
                         header = line;
                     }
-                    resource = header
+                    resourceName = header
                             .replaceAll("GET /", "")
                             .replaceAll(" HTTP.*", "");
-                } while ((line = bufferedReader1.readLine()) != null
-                        || !(line = bufferedReader1.readLine()).isEmpty());
-                writeContent(bufferedWriter, resource);
+                }
+                writeContent(bufferedWriter, resourceName);
                 System.out.println("++++++++++++++++++++++++++++++++++++++++++");
                 System.out.println("Finish");
             }
@@ -76,9 +76,9 @@ public class WebServer {
         return resource;
     }
 
-    private void writeContent(BufferedWriter bufferedWriter, String resource) throws IOException {
+    private void writeContent(BufferedWriter bufferedWriter, String resourceName) throws IOException {
         StringBuilder content = new StringBuilder();
-        Scanner scanner = new Scanner(new File("src/main/resources/" + resource));
+        Scanner scanner = new Scanner(new File(RESOURCES_DIRECTORY + resourceName));
         while (scanner.hasNextLine()) {
             content.append(scanner.nextLine());
         }
