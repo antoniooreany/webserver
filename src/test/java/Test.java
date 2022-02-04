@@ -6,10 +6,10 @@ public class Test {
 
     @org.junit.jupiter.api.Test
     public void test() throws IOException {
-        WebServer server = new WebServer(3000);
+//        WebServer server = new WebServer(3000);
 //        server.setWebAppPath("src/main/resources" + url);
-        server.setWebAppPath("src/main/resources/");
-        server.start();
+//        server.setWebAppPath("src/main/resources/");
+//        server.start();
     }
 }
 

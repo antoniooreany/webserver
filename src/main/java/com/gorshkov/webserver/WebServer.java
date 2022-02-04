@@ -8,7 +8,7 @@ import java.util.Scanner;
 public class WebServer {
 
     private final int port;
-    private String webAppPath = "src/main/resources/";
+    private String webAppPath;
 
     public WebServer(int port) {
         this.port = port;
@@ -19,31 +19,32 @@ public class WebServer {
     }
 
     public void start() throws IOException {
-        try (ServerSocket serverSocket = new ServerSocket(3000)) {
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Started");
-            try (Socket socket = serverSocket.accept(); BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream())); BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
-                String header = getHeader(bufferedReader);
-                String resource = getResource(header);
-                System.out.println("Writing response");
-                writeHeader(bufferedWriter);
-                System.out.println("Writing content");
-                writeBody(bufferedWriter, resource);
-            }
-            System.out.println("++++++++++++++++++++++++++++++++++++++++++");
-
-            String header = "";
-            String resource;
-            try (Socket socket = serverSocket.accept(); BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream())); BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
-                header = getHeader(bufferedReader);
-                resource = getResource(header);
-                System.out.println("Writing response");
-                writeHeader(bufferedWriter);
-                System.out.println("Writing content");
-                writeBody(bufferedWriter, resource);
-
-                System.out.println("Finish");
-            }
+            writeResponse(serverSocket);
+            writeResponse(serverSocket);
+            System.out.println("Finished");
         }
+    }
+
+    private void writeResponse(ServerSocket serverSocket) throws IOException {
+        try (Socket socket = serverSocket.accept(); BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream())); BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
+            String resource = getResource(bufferedReader);
+            writeResponse(bufferedWriter, resource);
+        }
+    }
+
+    private void writeResponse(BufferedWriter bufferedWriter, String resource) throws IOException {
+        System.out.println("Writing response");
+        writeHeader(bufferedWriter);
+        System.out.println("Writing content");
+        writeBody(bufferedWriter, resource);
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++");
+    }
+
+    private String getResource(BufferedReader bufferedReader) throws IOException {
+        String header = getHeader(bufferedReader);
+        return getResource(header);
     }
 
     private String getHeader(BufferedReader bufferedReader) throws IOException {
@@ -59,8 +60,10 @@ public class WebServer {
     }
 
     private String getResource(String header) {
-        String resource = header.replaceAll("GET /", "").replaceAll(" HTTP.*", "");
-        System.out.println(resource);
+        String[] headerParts = header.split("\s");
+        String httpMethod = headerParts[0];
+        String resource = headerParts[1];
+        String httpVersion = headerParts[2];
         return resource;
     }
 
