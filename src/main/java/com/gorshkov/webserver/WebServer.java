@@ -39,10 +39,8 @@ public class WebServer {
             String header = "";
             String resourceName;
             try (Socket socket = serverSocket.accept();
-                 BufferedReader bufferedReader = new BufferedReader(
-                         new InputStreamReader(socket.getInputStream()));
-                 BufferedWriter bufferedWriter = new BufferedWriter(
-                         new OutputStreamWriter(socket.getOutputStream()))) {
+                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
                 while ((line = bufferedReader.readLine()) != null || !(line = bufferedReader.readLine()).isEmpty()); {
                     if (line.startsWith("GET")) {
                         header = line;
