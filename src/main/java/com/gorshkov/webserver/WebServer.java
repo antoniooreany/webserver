@@ -21,11 +21,7 @@ public class WebServer {
     public void start() throws IOException {
         try (ServerSocket serverSocket = new ServerSocket(3000)) {
             System.out.println("Started");
-            try (Socket socket = serverSocket.accept();
-                 BufferedReader bufferedReader = new BufferedReader(
-                         new InputStreamReader(socket.getInputStream()));
-                 BufferedWriter bufferedWriter = new BufferedWriter(
-                         new OutputStreamWriter(socket.getOutputStream()))) {
+            try (Socket socket = serverSocket.accept(); BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream())); BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
                 String header = getHeader(bufferedReader);
                 String resource = getResource(header);
                 System.out.println("Writing response");
@@ -35,25 +31,16 @@ public class WebServer {
             }
             System.out.println("++++++++++++++++++++++++++++++++++++++++++");
 
-            String line;
             String header = "";
-            String resourceName;
-            try (Socket socket = serverSocket.accept();
-                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
-                while (true) {
-                    String readLine = bufferedReader.readLine();
-                    if (!((line = readLine) != null //TODO Why 'line' is never used ?
-                                            || !(line = readLine).isEmpty())) break;
-                    ;
-                }
-                {
-                    if (line.startsWith("GET")) { //TODO Why always false ?
-                        header = line;
-                    }
-                    resourceName = getResource(header);
-                }
-                writeBody(bufferedWriter, resourceName);
+            String resource;
+            try (Socket socket = serverSocket.accept(); BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream())); BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
+                header = getHeader(bufferedReader);
+                resource = getResource(header);
+                System.out.println("Writing response");
+                writeHeader(bufferedWriter);
+                System.out.println("Writing content");
+                writeBody(bufferedWriter, resource);
+
                 System.out.println("Finish");
             }
         }
@@ -72,8 +59,7 @@ public class WebServer {
     }
 
     private String getResource(String header) {
-        String resource = header.replaceAll("GET /", "")
-                .replaceAll(" HTTP.*", "");
+        String resource = header.replaceAll("GET /", "").replaceAll(" HTTP.*", "");
         System.out.println(resource);
         return resource;
     }
