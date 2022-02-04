@@ -8,14 +8,14 @@ import java.util.Scanner;
 public class WebServer {
 
     private final int port;
-    private final static String RESOURCES_DIRECTORY = "src/main/resources/";
+    private String webAppPath = "src/main/resources/";
 
     public WebServer(int port) {
         this.port = port;
     }
 
-    public static void main(String[] args) throws IOException {
-        new WebServer(3000).start();
+    public void setWebAppPath(String webAppPath) {
+        this.webAppPath = webAppPath;
     }
 
     public void start() throws IOException {
@@ -29,9 +29,9 @@ public class WebServer {
                 String header = getHeader(bufferedReader);
                 String resource = getResource(header);
                 System.out.println("Writing response");
-                writeResponse(bufferedWriter);
+                writeHeader(bufferedWriter);
                 System.out.println("Writing content");
-                writeContent(bufferedWriter, resource);
+                writeBody(bufferedWriter, resource);
             }
             System.out.println("++++++++++++++++++++++++++++++++++++++++++");
 
@@ -47,11 +47,9 @@ public class WebServer {
                     if (line.startsWith("GET")) {
                         header = line;
                     }
-                    resourceName = header
-                            .replaceAll("GET /", "")
-                            .replaceAll(" HTTP.*", "");
+                    resourceName = getResource(header);
                 }
-                writeContent(bufferedWriter, resourceName);
+                writeBody(bufferedWriter, resourceName);
                 System.out.println("Finish");
             }
         }
@@ -76,16 +74,16 @@ public class WebServer {
         return resource;
     }
 
-    private void writeContent(BufferedWriter bufferedWriter, String resourceName) throws IOException {
+    private void writeBody(BufferedWriter bufferedWriter, String resourceName) throws IOException {
         StringBuilder content = new StringBuilder();
-        Scanner scanner = new Scanner(new File(RESOURCES_DIRECTORY + resourceName));
+        Scanner scanner = new Scanner(new File(webAppPath + resourceName));
         while (scanner.hasNextLine()) {
             content.append(scanner.nextLine());
         }
         bufferedWriter.write(content.toString());
     }
 
-    private void writeResponse(BufferedWriter bufferedWriter) throws IOException {
+    private void writeHeader(BufferedWriter bufferedWriter) throws IOException {
         bufferedWriter.write("HTTP/1.1 200 OK");
         bufferedWriter.newLine();
         bufferedWriter.newLine();
