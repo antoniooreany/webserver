@@ -33,6 +33,7 @@ public class WebServer {
                 System.out.println("Writing content");
                 writeContent(bufferedWriter, resource);
             }
+            System.out.println("++++++++++++++++++++++++++++++++++++++++++");
 
             String line = "";
             String header = "";
@@ -42,7 +43,7 @@ public class WebServer {
                          new InputStreamReader(socket.getInputStream()));
                  BufferedWriter bufferedWriter = new BufferedWriter(
                          new OutputStreamWriter(socket.getOutputStream()))) {
-                while (/*(line = bufferedReader.readLine()) != null ||*/ !(line = bufferedReader.readLine()).isEmpty()); {
+                while ((line = bufferedReader.readLine()) != null || !(line = bufferedReader.readLine()).isEmpty()); {
                     if (line.startsWith("GET")) {
                         header = line;
                     }
@@ -51,7 +52,6 @@ public class WebServer {
                             .replaceAll(" HTTP.*", "");
                 }
                 writeContent(bufferedWriter, resourceName);
-                System.out.println("++++++++++++++++++++++++++++++++++++++++++");
                 System.out.println("Finish");
             }
         }
