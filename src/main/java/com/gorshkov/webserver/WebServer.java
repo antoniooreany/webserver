@@ -41,8 +41,13 @@ public class WebServer {
             try (Socket socket = serverSocket.accept();
                  BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                  BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
-                while ((line = bufferedReader.readLine()) != null //TODO Why 'line' is never used ?
-                        || !(line = bufferedReader.readLine()).isEmpty()); {
+                while (true) {
+                    String readLine = bufferedReader.readLine();
+                    if (!((line = readLine) != null //TODO Why 'line' is never used ?
+                                            || !(line = readLine).isEmpty())) break;
+                    ;
+                }
+                {
                     if (line.startsWith("GET")) { //TODO Why always false ?
                         header = line;
                     }
